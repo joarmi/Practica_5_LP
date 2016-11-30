@@ -48,13 +48,15 @@ other_id_char   = [_]
 valido          = ({letter}|{other_id_char}){1,8}
 datos           = {letter}|{number}|" " | {other_id_char}
 
+numeros         = 0 | [1-9][0-9]*
+
 %%
 
 /*reglas*/
 <YYINITIAL> {
 
-        {Comment_multiple}  {return symbol(sym.COM_ANIDADO);}                    /*{System.out.println("He leido un comentario anidado");}*/ 
-        {Comment}   {return symbol(sym.COM);}                                    /*{System.out.println("He leido un comentario");}*/
+        {Comment_multiple}  {/*ignore*/}                                        /*{System.out.println("He leido un comentario anidado");}*/ 
+        {Comment}   {/*ignore*/}                                                /*{System.out.println("He leido un comentario");}*/
         "mostrar"   {return symbol(sym.MOSTRAR);}                                /*{System.out.println("He leido Mostrar");}*/
         "leer"      {return symbol(sym.LEER);}                                   /*{System.out.println("He leido leer");}*/
         ";"         {return symbol(sym.PUNTO_COMA);}                             /*{System.out.println("He leido final de linea");}*/
@@ -64,8 +66,11 @@ datos           = {letter}|{number}|" " | {other_id_char}
         "+"         {return symbol(sym.SUMA);}                                   /*{System.out.println("He leido Suma");}*/
         "-"         {return symbol(sym.RESTA);}                                  /*{System.out.println("He leido Resta");}*/
         {valido}    {return symbol(sym.VARIABLE_VALIDA, yytext());}              /*{System.out.println("Elemento valido " + yytext());}*/
-        " "         {return symbol(sym.ESPACIO_BLANCO);}                         /*{ /*ignore*/ }*/
-        {LineTerminator}    {return symbol(sym.FIN_LINEA);}                      /*{/*ignore*/}*/
+        " "         {/*ignore*/}                         
+        {LineTerminator}    {/*ignore*/}                      
+        "("         {return symbol(sym.PAR_ABIERTO);}
+        ")"         {return symbol(sym.PAR_CERRADO);}
+        {numeros}    {return symbol(sym.INTEGER_LITERAL, Integer.parseInt(yytext()));}
 
         /* error fallback */ 
         [^]          { throw new Error("Illegal character <"+ yytext()+">"); }
